@@ -11,6 +11,7 @@ import Env
 import Logger
 import Template
 import BootstrapTemplate
+import SwiftGD
 
 class WebServer {
     private let logger = Logger(WebServer.self)
@@ -58,6 +59,55 @@ class WebServer {
             let template = self.pageTemplate
             template["content"] = listTemplate
             return .ok(.html(wrapTemplate(template)))
+        }
+        
+        
+        server["/labelPreview"] = { [unowned self] request, _ in
+            guard let labelID = request.queryParams["labelID"]?.decimal, let label = project.objectLabels[safeIndex: labelID] else {
+                return .movedTemporarily("/labels")
+            }
+            
+            let previewTemplate = Template.cached(relativePath: "templates/label-preview.tpl.html")
+            for (imageIndex, image) in project.inputImages.enumerated() {
+                for (objectIndex, object) in project.getObjectsOnImage(imageIndex: imageIndex).enumerated() {
+                    guard object.labelID == labelID else {
+                        continue
+                    }
+                    previewTemplate.assign(["imageIndex": "\(imageIndex)",
+                                            "objectIndex": objectIndex,
+                                            "filename": image.filename,
+                                           ], inNest: "image")
+                }
+                
+            }
+            previewTemplate["id"] = label.id
+            previewTemplate["label"] = label.name
+
+            let template = self.pageTemplate
+            template["content"] = previewTemplate
+            return .ok(.html(wrapTemplate(template)))
+        }
+        
+        // label image preview
+        server["/preview"] = { [unowned self] request, headers in
+            guard let index = request.queryParams.get("imageIndex")?.decimal,
+                    let inputImage = project.inputImages[safeIndex: index],
+            let objectIndex = request.queryParams["objectIndex"]?.decimal,
+            let object = project.getObjectsOnImage(imageIndex: index)[safeIndex: objectIndex] else {
+                return .notFound()
+            }
+            let image = try? Image(url: inputImage.url)?.cropped(to: Rectangle(x: object.imageArea.left,
+                                         y: object.imageArea.top,
+                                         width: object.imageArea.width,
+                                                                          height: object.imageArea.height))?.export(as: .jpg(quality: 90))
+            guard let image else {
+                return .notFound()
+            }
+            
+            headers.addHeader("Content-Type", "image/jpeg")
+            return .raw(200, "OK", { writer in
+                try writer.write(image)
+            })
         }
         
         server["/images"] = { [unowned self] request, _ in

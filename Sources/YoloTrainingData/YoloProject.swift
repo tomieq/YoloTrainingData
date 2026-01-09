@@ -58,7 +58,20 @@ class YoloProject {
         let data = imageInfo[imageIndex] ?? ImageInfo()
         data.objects.append(ObjectOnImage(labelID: labelID, imageArea: imageArea))
         imageInfo[imageIndex] = data
-        outputWriter.store(inputImage: inputImage, objects: data.objects, type: data.type)
+        outputWriter.store(inputImage: inputImage, info: data)
+    }
+    
+    func setImageType(imageIndex: Int, type: ImageType) {
+        guard let inputImage = inputImages[safeIndex: imageIndex], let info = imageInfo[imageIndex] else {
+            logger.e("Invalid image index \(imageIndex)")
+            return
+        }
+        info.type = type
+        outputWriter.store(inputImage: inputImage, info: info)
+    }
+    
+    func getImageType(imageIndex: Int) -> ImageType? {
+        imageInfo[imageIndex]?.type
     }
     
     func removeObject(imageIndex: Int, objectIndex: Int) {

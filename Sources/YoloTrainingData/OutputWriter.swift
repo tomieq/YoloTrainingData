@@ -30,7 +30,7 @@ class OutputWriter {
         try? FileManager.default.createDirectory(at: validateLabelsUrl, withIntermediateDirectories: true)
     }
     
-    func store(inputImage: InputImage, objects: [ObjectOnImage], type: ImageType) {
+    func store(inputImage: InputImage, info: ImageInfo) {
         let imageUrl: URL
         let labelsUrl: URL
         
@@ -38,7 +38,7 @@ class OutputWriter {
         let imageFilename = inputImage.filename.replacingOccurrences(of: "/", with: "-")
         let labelFilename = "\(imageFilename.split(".")[0]).txt"
         
-        if type == .training {
+        if info.type == .training {
             imageUrl = trainImagesUrl.appendingPathComponent(imageFilename)
             labelsUrl = trainLabelsUrl
             

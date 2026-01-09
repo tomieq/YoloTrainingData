@@ -5,7 +5,7 @@
 //  Created by: tomieq on 09/01/2026
 //
 
-enum ImageType {
+enum ImageType: String, CaseIterable {
     case training
     case validation
 }

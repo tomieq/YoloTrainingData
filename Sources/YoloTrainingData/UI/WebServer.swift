@@ -134,7 +134,7 @@ class WebServer {
         }
         
         server["/image"] = { [unowned self] request, _ in
-            guard let index = request.queryParams.get("imageIndex")?.decimal, let _ = project.inputImages[safeIndex: index] else {
+            guard let index = request.queryParams.get("imageIndex")?.decimal, let inputImage = project.inputImages[safeIndex: index] else {
                 return .movedTemporarily("/images")
             }
             struct Input: Codable {
@@ -155,7 +155,8 @@ class WebServer {
             picTemplate["index"] = index
             picTemplate["nextIndex"] = index.incremented
             picTemplate["prevIndex"] = index.decremented
-            picTemplate["imageUrl"] = "/file?imageIndex=\(index)"
+            picTemplate["imageUrl"] = "/file?imageIndex=\(index)&filename=\(inputImage.filename)"
+            picTemplate["filename"] = inputImage.filename
             
             var nextCounter = 0
             for (counter, object) in project.getObjectsOnImage(imageIndex: index).enumerated() {
@@ -176,8 +177,8 @@ class WebServer {
             
             template["content"] = picTemplate
             let mainTemplate = wrapTemplate(template)
-            mainTemplate.addJS(url: "/editor.js?imageIndex=" + index.description)
             mainTemplate.addJS(url: "/script.js?counter=\(nextCounter)")
+            mainTemplate.addJS(url: "/editor.js?imageIndex=" + index.description)
             return .ok(.html(mainTemplate))
         }
         
@@ -185,7 +186,7 @@ class WebServer {
             guard let index = request.queryParams.get("imageIndex")?.decimal, let inputImage = project.inputImages[safeIndex: index] else {
                 return .notFound()
             }
-            try HttpFileResponse.with(absolutePath: inputImage.url.path)
+            try HttpFileResponse.with(absolutePath: inputImage.url.path, clientCache: .hours(1))
             return .notFound()
         }
         
@@ -212,10 +213,10 @@ class WebServer {
         server.notFoundHandler = { request, responseHeaders in
             request.disableKeepAlive = true
             if let filePath = BootstrapTemplate.absolutePath(for: request.path) {
-                try HttpFileResponse.with(absolutePath: filePath)
+                try HttpFileResponse.with(absolutePath: filePath, clientCache: .days(1))
             }
             let filePath = Resource().absolutePath(for: request.path)
-            try HttpFileResponse.with(absolutePath: filePath)
+            try HttpFileResponse.with(absolutePath: filePath, clientCache: .days(1))
             print("File `\(filePath)` doesn't exist")
             return .notFound()
         }

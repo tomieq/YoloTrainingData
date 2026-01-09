@@ -37,4 +37,10 @@ class YoloProject {
         logger.i("Images: \(inputImages)")
         self.outputWriter = OutputWriter(outputURL: outputURL)
     }
+    
+    func addLabel(name: String) {
+        let label = Label(id: labels.count, name: name)
+        labels.append(label)
+        logger.i("Added label \(label)")
+    }
 }

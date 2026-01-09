@@ -1,6 +1,15 @@
 {
-  "originHash" : "be2e091916b0c51b722e3c91c42cef6a8fd4244a36595c28363305968c5553a4",
+  "originHash" : "1520de1869123949e64055b61363f018ffbe058b1f864e3380bae40406d37501",
   "pins" : [
+    {
+      "identity" : "bootstrapstarter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tomieq/BootstrapStarter",
+      "state" : {
+        "branch" : "master",
+        "revision" : "437e3252af95a25bc6b476608d5607d578b71866"
+      }
+    },
     {
       "identity" : "env",
       "kind" : "remoteSourceControl",
@@ -20,12 +29,30 @@
       }
     },
     {
+      "identity" : "swifter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tomieq/swifter",
+      "state" : {
+        "revision" : "f80410f8ad1e47db4d126faf2447f7f9a7af4bc0",
+        "version" : "3.1.1"
+      }
+    },
+    {
       "identity" : "swiftextensions",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tomieq/SwiftExtensions",
       "state" : {
         "revision" : "25f8cafc1f6f4fa0e162ae383d96f93943b05ad9",
         "version" : "2.0.0"
+      }
+    },
+    {
+      "identity" : "template.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tomieq/Template.swift.git",
+      "state" : {
+        "revision" : "302854a17e2f38ba6a9cb79a46689884a44b5f70",
+        "version" : "1.6.0"
       }
     }
   ],

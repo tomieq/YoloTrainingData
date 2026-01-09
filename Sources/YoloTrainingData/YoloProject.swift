@@ -19,6 +19,9 @@ class YoloProject {
     private var labels: [Label]
     private let inputImages: [InputImage]
     private let outputWriter: OutputWriter
+    var objectLabels: [Label] {
+        labels
+    }
     
     init(inputURL: URL, outputURL: URL) throws {
         

@@ -23,3 +23,6 @@ let outputUrl = try env.get("OUTPUT_URL") ?! ConfirError.noOutputUrl
 let project = try YoloProject(inputURL: URL(fileURLWithPath: inputUrl, isDirectory: true),
                               outputURL: URL(fileURLWithPath: outputUrl, isDirectory: true))
 
+project.addLabel(name: "license")
+let webServer = WebServer(project: project, env: env)
+RunLoop.main.run()

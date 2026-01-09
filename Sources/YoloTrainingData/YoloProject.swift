@@ -50,10 +50,15 @@ class YoloProject {
     }
     
     func addObject(imageIndex: Int, labelID: Int, imageArea: ImageArea) {
+        guard let inputImage = inputImages[safeIndex: imageIndex] else {
+            logger.e("No image at index \(imageIndex)")
+            return
+        }
         logger.i("Added label \(labelID) on image \(imageIndex)")
         var objects = getObjectsOnImage(imageIndex: imageIndex)
         objects.append(ObjectOnImage(labelID: labelID, imageArea: imageArea))
         objectsOnImage[imageIndex] = objects
+        outputWriter.store(inputImage: inputImage, objects: objects, type: .validation)
     }
     
     func removeObject(imageIndex: Int, objectIndex: Int) {

@@ -5,6 +5,12 @@
 //  Created by: tomieq on 09/01/2026
 //
 import Foundation
+import SwiftExtensions
+
+enum ImageType {
+    case training
+    case validation
+}
 
 class OutputWriter {
     let outputURL: URL
@@ -27,6 +33,30 @@ class OutputWriter {
         validateLabelsUrl = labelsUrl.appendingPathComponent("val")
         try? FileManager.default.createDirectory(at: trainLabelsUrl, withIntermediateDirectories: true)
         try? FileManager.default.createDirectory(at: validateLabelsUrl, withIntermediateDirectories: true)
+    }
+    
+    func store(inputImage: InputImage, objects: [ObjectOnImage], type: ImageType) {
+        let imageUrl: URL
+        let labelsUrl: URL
+        
+        
+        let imageFilename = inputImage.filename.replacingOccurrences(of: "/", with: "-")
+        let labelFilename = "\(imageFilename.split(".")[0]).txt"
+        
+        if type == .training {
+            imageUrl = trainImagesUrl.appendingPathComponent(imageFilename)
+            labelsUrl = trainLabelsUrl
+            
+            try? FileManager.default.removeItem(at: validateImagesUrl.appendingPathComponent(imageFilename))
+        } else {
+            imageUrl = validateImagesUrl.appendingPathComponent(imageFilename)
+            labelsUrl = validateLabelsUrl
+            
+            try? FileManager.default.removeItem(at: trainImagesUrl.appendingPathComponent(imageFilename))
+        }
+        if FileManager.default.fileExists(atPath: imageUrl.path).not {
+            try? FileManager.default.copyItem(at: inputImage.url, to: imageUrl)
+        }
     }
 }
 

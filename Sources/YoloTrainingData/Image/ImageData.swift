@@ -27,6 +27,11 @@ class ImageData {
 }
 
 extension ImageData {
+    var outputFileName: String {
+        inputImage.filename.replacingOccurrences(of: "/", with: "-")
+    }
+}
+extension ImageData {
     var yoloImageData: [YoloImageData] {
         objects.map { object in
             YoloImageData(classID: object.labelID,

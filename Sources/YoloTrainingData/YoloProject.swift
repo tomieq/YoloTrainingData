@@ -39,9 +39,7 @@ class YoloProject {
         self.outputURL = outputURL
         self.labels = []
         
-        self.imageData = try InputImageLoader(inputURL: inputURL).load().map {
-            ImageData(inputImage: $0)
-        }
+        self.imageData = try InputImageLoader(inputURL: inputURL, outputURL: outputURL).load()
         logger.i("Loaded \(imageData.count) images")
         self.outputWriter = OutputWriter(outputURL: outputURL)
     }

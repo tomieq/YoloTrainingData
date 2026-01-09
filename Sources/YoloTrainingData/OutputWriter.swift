@@ -7,11 +7,6 @@
 import Foundation
 import SwiftExtensions
 
-enum ImageType {
-    case training
-    case validation
-}
-
 class OutputWriter {
     let outputURL: URL
     private let trainImagesUrl: URL

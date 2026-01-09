@@ -19,7 +19,7 @@ class YoloProject {
     private var labels: [Label]
     let inputImages: [InputImage]
     // key is index of image
-    private var objectsOnImage: [Int: [ObjectOnImage]] = [:]
+    private var imageInfo: [Int: ImageInfo] = [:]
     private let outputWriter: OutputWriter
     
     var objectLabels: [Label] {
@@ -55,19 +55,17 @@ class YoloProject {
             return
         }
         logger.i("Added label \(labelID) on image \(imageIndex)")
-        var objects = getObjectsOnImage(imageIndex: imageIndex)
-        objects.append(ObjectOnImage(labelID: labelID, imageArea: imageArea))
-        objectsOnImage[imageIndex] = objects
-        outputWriter.store(inputImage: inputImage, objects: objects, type: .validation)
+        let data = imageInfo[imageIndex] ?? ImageInfo()
+        data.objects.append(ObjectOnImage(labelID: labelID, imageArea: imageArea))
+        imageInfo[imageIndex] = data
+        outputWriter.store(inputImage: inputImage, objects: data.objects, type: data.type)
     }
     
     func removeObject(imageIndex: Int, objectIndex: Int) {
-        var objects = getObjectsOnImage(imageIndex: imageIndex)
-        objects.remove(at: objectIndex)
-        objectsOnImage[imageIndex] = objects
+        imageInfo[imageIndex]?.objects.remove(at: objectIndex)
     }
     
     func getObjectsOnImage(imageIndex: Int) -> [ObjectOnImage] {
-        objectsOnImage[imageIndex, default: []]
+        imageInfo[imageIndex]?.objects ?? []
     }
 }

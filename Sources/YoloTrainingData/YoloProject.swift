@@ -31,11 +31,7 @@ class YoloProject {
         self.outputURL = outputURL
         self.labels = []
         
-        var inputImages: [InputImage] = []
-        for url in try FileManager.default.contentsOfDirectory(at: inputURL, includingPropertiesForKeys: nil, options: []) {
-            inputImages.append(InputImage(url: url))
-        }
-        self.inputImages = inputImages
+        self.inputImages = try InputImageLoader(inputURL: inputURL).load()
         logger.i("Loaded \(inputImages.count) images")
     }
 }

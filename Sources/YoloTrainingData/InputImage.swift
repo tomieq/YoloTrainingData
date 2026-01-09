@@ -8,5 +8,6 @@ import Foundation
 
 struct InputImage {
     let url: URL
+    let subdirectory: String
 }
 

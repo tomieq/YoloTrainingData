@@ -21,6 +21,7 @@ function setup(imageIndex) {
       });
 
     $("#imageContainer").mousemove(function (event) {
+        event.preventDefault();
         if (border != undefined) {
             var parentOffset = $(this).parent().offset();
             var relX = event.pageX - parentOffset.left;
@@ -33,6 +34,7 @@ function setup(imageIndex) {
         }
     });
     $("#imageContainer").mousedown(function (event) {
+        event.preventDefault();
         var parentOffset = $(this).parent().offset();
         var relX = event.pageX - parentOffset.left;
         var relY = event.pageY - parentOffset.top;

@@ -15,7 +15,8 @@
 #formContainer {
     position: absolute;
     top: 0;
-    left: 805px;
+    left: {formLeftOffset}px;
+    width: 300px;
 }
 .counter {
     background-color: blue;

@@ -17,7 +17,7 @@ class YoloProject {
     let inputURL: URL
     let outputURL: URL
     private var labels: [Label]
-    private let inputImages: [InputImage]
+    let inputImages: [InputImage]
     private let outputWriter: OutputWriter
     var objectLabels: [Label] {
         labels
@@ -37,7 +37,6 @@ class YoloProject {
         
         self.inputImages = try InputImageLoader(inputURL: inputURL).load()
         logger.i("Loaded \(inputImages.count) images")
-        logger.i("Images: \(inputImages)")
         self.outputWriter = OutputWriter(outputURL: outputURL)
     }
     

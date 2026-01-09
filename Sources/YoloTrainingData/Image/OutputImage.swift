@@ -14,7 +14,7 @@ class OutputImage {
     }
     
     var fileName: String {
-        inputImage.subdirectory.replacingOccurrences(of: "/", with: "-").appending(inputImage.url.lastPathComponent)
+        inputImage.subdirectory.replacingOccurrences(of: "/", with: "-").appending(inputImage.filename)
     }
 }
 

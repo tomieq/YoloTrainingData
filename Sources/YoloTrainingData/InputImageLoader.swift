@@ -29,7 +29,7 @@ class InputImageLoader {
             }
             
         }
-        return images
+        return images.sorted(by: { $0.url.path < $1.url.path })
     }
     
     private func isDirectory(url: URL) throws -> Bool {

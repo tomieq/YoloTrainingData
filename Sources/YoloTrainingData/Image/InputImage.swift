@@ -8,13 +8,11 @@ import Foundation
 
 struct InputImage {
     let url: URL
-    let subdirectory: String
     let filename: String
     
-    init(url: URL, subdirectory: String) {
+    init(url: URL, filename: String) {
         self.url = url
-        self.subdirectory = subdirectory
-        self.filename = url.lastPathComponent
+        self.filename = filename
     }
 }
 

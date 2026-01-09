@@ -64,33 +64,39 @@ class WebServer {
 
             let listTemplate = Template.cached(relativePath: "templates/image-list.tpl.html")
             for (index, image) in project.inputImages.enumerated() {
-                let visibleName = image.subdirectory + image.filename
-                listTemplate.assign(["imageIndex": "\(index)", "filename": visibleName], inNest: "image")
+                listTemplate.assign(["imageIndex": "\(index)", "filename": image.filename], inNest: "image")
             }
             let template = self.pageTemplate
             template["content"] = listTemplate
             return .ok(.html(wrapTemplate(template)))
         }
         
-        func selectLabelRaw() -> String {
+        func selectLabelRaw(selectedLabelID: Int? = nil) -> String {
             let selectLabelTemplate = Template.cached(relativePath: "templates/select-label.tpl.html")
             for label in project.objectLabels {
-                selectLabelTemplate.assign(label, inNest: "option")
+                if label.id == selectedLabelID {
+                    selectLabelTemplate.assign(label, inNest: "selected")
+                } else {
+                    selectLabelTemplate.assign(label, inNest: "option")
+                }
             }
             return selectLabelTemplate.output.replacingOccurrences(of: "\n", with: "")
         }
         
         server["/image"] = { [unowned self] request, _ in
-            guard let index = request.queryParams.get("imageIndex")?.decimal, let inputImage = project.inputImages[safeIndex: index] else {
+            guard let index = request.queryParams.get("imageIndex")?.decimal, let _ = project.inputImages[safeIndex: index] else {
                 return .movedTemporarily("/images")
             }
             struct Input: Codable {
                 let frame: String
-                let label: String
+                let label: Int
             }
-            let input: Input = try request.formData.decode()
-            if let frame = ImageArea(json: input.frame) {
-                
+            
+            if let input: Input = try? request.formData.decode(), let imageArea = ImageArea(json: input.frame) {
+                project.addObject(imageIndex: index, labelID: input.label, imageArea: imageArea)
+            }
+            if let labelIndexToRemove = request.queryParams.get("removeLabelIndex")?.decimal {
+                project.removeObject(imageIndex: index, objectIndex: labelIndexToRemove)
             }
             
             
@@ -101,12 +107,27 @@ class WebServer {
             picTemplate["prevIndex"] = index.decremented
             picTemplate["imageUrl"] = "/file?imageIndex=\(index)"
             
-            var counter = 0
+            var nextCounter = 0
+            for (counter, object) in project.getObjectsOnImage(imageIndex: index).enumerated() {
+                let frame = object.imageArea
+                picTemplate.assign(["left" : frame.left,
+                                    "top": frame.top,
+                                    "width": frame.width,
+                                    "height": frame.height,
+                                    "counter": counter], inNest: "frame")
+                picTemplate.assign(["frame" : frame.jsonOneLine!,
+                                    "imageIndex": index,
+                                    "label": object.labelID,
+                                    "selectLabel": selectLabelRaw(selectedLabelID: object.labelID),
+                                    "labelIndex": counter,
+                                    "counter": counter], inNest: "form")
+                nextCounter = counter.incremented
+            }
             
             template["content"] = picTemplate
             let mainTemplate = wrapTemplate(template)
             mainTemplate.addJS(url: "/editor.js?imageIndex=" + index.description)
-            mainTemplate.addJS(url: "/script.js")
+            mainTemplate.addJS(url: "/script.js?counter=\(nextCounter)")
             return .ok(.html(mainTemplate))
         }
         
@@ -128,6 +149,7 @@ class WebServer {
             let js = Template.cached(relativePath: "templates/script.tpl.js")
             js["previewWidth"] = env.get("PREVIEW_WIDTH") ?? 512
             js["selectLabelRaw"] = selectLabelRaw()
+            js["counter"] = request.queryParams.get("counter")?.decimal ?? 0
             return .ok(.js(js))
         }
         

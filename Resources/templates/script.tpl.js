@@ -1,4 +1,4 @@
-var counter = 0
+var counter = {counter};
 
 function setup(imageIndex) {
     counter = $("#formContainer form").length
@@ -32,7 +32,6 @@ function setup(imageIndex) {
         }
     });
     $("#imageContainer").mousedown(function (event) {
-        counter++;
         var parentOffset = $(this).parent().offset();
         var relX = event.pageX - parentOffset.left;
         var relY = event.pageY - parentOffset.top;
@@ -58,6 +57,7 @@ function setup(imageIndex) {
         border.append(number);
         border = undefined;
         makeForm(counter, top, left, width, height, imageIndex)
+        counter++;
     });
 }
 
@@ -68,7 +68,7 @@ function makeForm(counter, top, left, width, height, imageIndex) {
     index.css({float: "left"});
     index.html(counter);
     form.append(index);
-    var submit = $('<div class="col"><input type="submit" class="btn btn-sm btn-light" value="💾"/></div>');
+    var submit = $('<div class="col"><input type="submit" class="btn btn-sm btn-light" value="&#128190;"/></div>');
     submit.css({float: "right"});
     form.append(submit);
     var input = $('<div class="col">{selectLabelRaw}</div>');

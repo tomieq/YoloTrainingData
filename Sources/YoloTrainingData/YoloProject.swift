@@ -18,7 +18,10 @@ class YoloProject {
     let outputURL: URL
     private var labels: [Label]
     let inputImages: [InputImage]
+    // key is index of image
+    private var objectsOnImage: [Int: [ObjectOnImage]] = [:]
     private let outputWriter: OutputWriter
+    
     var objectLabels: [Label] {
         labels
     }
@@ -44,5 +47,22 @@ class YoloProject {
         let label = Label(id: labels.count, name: name)
         labels.append(label)
         logger.i("Added label \(label)")
+    }
+    
+    func addObject(imageIndex: Int, labelID: Int, imageArea: ImageArea) {
+        logger.i("Added label \(labelID) on image \(imageIndex)")
+        var objects = getObjectsOnImage(imageIndex: imageIndex)
+        objects.append(ObjectOnImage(labelID: labelID, imageArea: imageArea))
+        objectsOnImage[imageIndex] = objects
+    }
+    
+    func removeObject(imageIndex: Int, objectIndex: Int) {
+        var objects = getObjectsOnImage(imageIndex: imageIndex)
+        objects.remove(at: objectIndex)
+        objectsOnImage[imageIndex] = objects
+    }
+    
+    func getObjectsOnImage(imageIndex: Int) -> [ObjectOnImage] {
+        objectsOnImage[imageIndex, default: []]
     }
 }

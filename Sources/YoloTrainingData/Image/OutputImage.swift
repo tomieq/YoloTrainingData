@@ -12,9 +12,5 @@ class OutputImage {
     init(inputImage: InputImage) {
         self.inputImage = inputImage
     }
-    
-    var fileName: String {
-        inputImage.subdirectory.replacingOccurrences(of: "/", with: "-").appending(inputImage.filename)
-    }
 }
 

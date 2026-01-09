@@ -15,11 +15,12 @@
     <div id="formContainer">
         [START form]
         <form method="post">
-            <div class="counter" style="float: left;">{counter}</div>
+            <div style="float: left; width:35px;">{counter}</div>
+            <input type="submit" class="btn btn-sm btn-light" style="float: right;" value="&#128190;"/>
+            <a href="/image?imageIndex={imageIndex}&removeLabelIndex={labelIndex}" class="btn btn-sm btn-danger" style="float: right;">&#9003;</a>
             {selectLabel}
-            <input type="hidden" name="index" value="{index}" />
+            <input type="hidden" name="imageIndex" value="{imageIndex}" />
             <input type="hidden" name="frame" value='{frame}' />
-            <input type="submit" class="btn btn-sm btn-primary" value="Save"/>
         </form>
         [END form]
     </div>

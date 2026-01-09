@@ -21,7 +21,7 @@ class InputImageLoader {
         var images: [InputImage] = []
         for url in try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: []) {
             if url.path.hasSuffix(".jpg").or(url.path.hasSuffix(".png")) {
-                images.append(InputImage(url: url, subdirectory: subdirectory))
+                images.append(InputImage(url: url, filename: subdirectory + url.lastPathComponent))
             } else if let isDir = try? isDirectory(url: url), isDir {
                 var lowerSubdirectory = subdirectory
                 lowerSubdirectory.append("\(url.lastPathComponent)/")

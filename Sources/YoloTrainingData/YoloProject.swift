@@ -16,8 +16,9 @@ class YoloProject {
     private let logger = Logger(YoloProject.self)
     let inputURL: URL
     let outputURL: URL
-    var labels: [Label]
-    let inputImages: [InputImage]
+    private var labels: [Label]
+    private let inputImages: [InputImage]
+    private let outputWriter: OutputWriter
     
     init(inputURL: URL, outputURL: URL) throws {
         
@@ -33,5 +34,7 @@ class YoloProject {
         
         self.inputImages = try InputImageLoader(inputURL: inputURL).load()
         logger.i("Loaded \(inputImages.count) images")
+        logger.i("Images: \(inputImages)")
+        self.outputWriter = OutputWriter(outputURL: outputURL)
     }
 }

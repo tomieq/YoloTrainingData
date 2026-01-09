@@ -127,10 +127,11 @@ class WebServer {
                   let object = project.getObjectsOnImage(imageIndex: index)[safeIndex: objectIndex] else {
                 return .notFound()
             }
-            let image = try? Image(url: inputImage.url)?.cropped(to: Rectangle(x: object.imageArea.left,
-                                                                               y: object.imageArea.top,
-                                                                               width: object.imageArea.width,
-                                                                               height: object.imageArea.height))?.export(as: .jpg(quality: 90))
+            let image = try Image(url: inputImage.url)?
+                .cropped(to: Rectangle(x: object.imageArea.left,
+                                       y: object.imageArea.top,
+                                       width: object.imageArea.width,
+                                       height: object.imageArea.height))?.export(as: .jpg(quality: 90))
             guard let image else {
                 return .notFound()
             }

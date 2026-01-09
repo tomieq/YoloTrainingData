@@ -71,6 +71,14 @@ class YoloProject {
         outputWriter.store(data: data)
     }
     
+    func setImageSize(imageIndex: Int, size: ImageSize) {
+        guard let data = imageData[safeIndex: imageIndex] else {
+            logger.e("Invalid image index \(imageIndex)")
+            return
+        }
+        data.size = size
+    }
+    
     func getImageType(imageIndex: Int) -> ImageType? {
         imageData[safeIndex: imageIndex]?.type
     }

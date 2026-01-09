@@ -40,18 +40,24 @@ class OutputWriter {
         
         if data.type == .training {
             imageUrl = trainImagesUrl.appendingPathComponent(imageFilename)
-            labelsUrl = trainLabelsUrl
+            labelsUrl = trainLabelsUrl.appendingPathComponent(labelFilename)
             
             try? FileManager.default.removeItem(at: validateImagesUrl.appendingPathComponent(imageFilename))
         } else {
             imageUrl = validateImagesUrl.appendingPathComponent(imageFilename)
-            labelsUrl = validateLabelsUrl
+            labelsUrl = validateLabelsUrl.appendingPathComponent(labelFilename)
             
             try? FileManager.default.removeItem(at: trainImagesUrl.appendingPathComponent(imageFilename))
         }
         if FileManager.default.fileExists(atPath: imageUrl.path).not {
             try? FileManager.default.copyItem(at: data.inputImage.url, to: imageUrl)
         }
+        
+        try? FileManager.default.removeItem(at: trainLabelsUrl.appendingPathComponent(labelFilename))
+        try? FileManager.default.removeItem(at: validateLabelsUrl.appendingPathComponent(labelFilename))
+        
+        try? data.yoloImageData.map { $0.serialized }.joined(separator: "\n").write(to: labelsUrl, atomically: false , encoding: .utf8)
+        
     }
 }
 

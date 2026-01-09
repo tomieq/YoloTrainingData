@@ -1,4 +1,5 @@
 var counter = {counter};
+var borderWidth = 2;
 
 function setup(imageIndex) {
     counter = $("#formContainer form").length
@@ -46,8 +47,8 @@ function setup(imageIndex) {
     $("#imageContainer").mouseup(function (event) {
         var left = Math.round(border.position().left * multiplier);
         var top = Math.round(border.position().top * multiplier);
-        var width = Math.round(border.width() * multiplier);
-        var height = Math.round(border.height() * multiplier);
+        var width = Math.round(border.width() * multiplier) + borderWidth * 2;
+        var height = Math.round(border.height() * multiplier) + borderWidth * 2;
         //console.log("captured object on image; left: " + border.position().left + "px; top: " + border.position().top + "px; width: "+ border.width() + "px; height: "+ border.height() + "px;");
         console.log("captured object on image; left: " + left + "px; top: " + top + "px; width: "+ width + "px; height: "+ height + "px;");
         

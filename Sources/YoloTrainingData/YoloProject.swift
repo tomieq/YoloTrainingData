@@ -17,17 +17,18 @@ class YoloProject {
     let inputURL: URL
     let outputURL: URL
     private var labels: [Label]
-    let inputImages: [InputImage]
     // key is index of image
-    private var imageInfo: [Int: ImageInfo] = [:]
+    private var imageData: [ImageData] = []
     private let outputWriter: OutputWriter
     
+    var inputImages: [InputImage] {
+        imageData.map(\.inputImage)
+    }
     var objectLabels: [Label] {
         labels
     }
     
     init(inputURL: URL, outputURL: URL) throws {
-        
         guard FileManager.default.fileExists(atPath: inputURL.path) else {
             throw YoloProjectError.invalidInputURL
         }
@@ -38,8 +39,10 @@ class YoloProject {
         self.outputURL = outputURL
         self.labels = []
         
-        self.inputImages = try InputImageLoader(inputURL: inputURL).load()
-        logger.i("Loaded \(inputImages.count) images")
+        self.imageData = try InputImageLoader(inputURL: inputURL).load().map {
+            ImageData(inputImage: $0)
+        }
+        logger.i("Loaded \(imageData.count) images")
         self.outputWriter = OutputWriter(outputURL: outputURL)
     }
     
@@ -50,35 +53,33 @@ class YoloProject {
     }
     
     func addObject(imageIndex: Int, labelID: Int, imageArea: ImageArea) {
-        guard let inputImage = inputImages[safeIndex: imageIndex] else {
+        guard let data = imageData[safeIndex: imageIndex] else {
             logger.e("No image at index \(imageIndex)")
             return
         }
         logger.i("Added label \(labelID) on image \(imageIndex)")
-        let data = imageInfo[imageIndex] ?? ImageInfo()
         data.objects.append(ObjectOnImage(labelID: labelID, imageArea: imageArea))
-        imageInfo[imageIndex] = data
-        outputWriter.store(inputImage: inputImage, info: data)
+        outputWriter.store(data: data)
     }
     
     func setImageType(imageIndex: Int, type: ImageType) {
-        guard let inputImage = inputImages[safeIndex: imageIndex], let info = imageInfo[imageIndex] else {
+        guard let data = imageData[safeIndex: imageIndex] else {
             logger.e("Invalid image index \(imageIndex)")
             return
         }
-        info.type = type
-        outputWriter.store(inputImage: inputImage, info: info)
+        data.type = type
+        outputWriter.store(data: data)
     }
     
     func getImageType(imageIndex: Int) -> ImageType? {
-        imageInfo[imageIndex]?.type
+        imageData[safeIndex: imageIndex]?.type
     }
     
     func removeObject(imageIndex: Int, objectIndex: Int) {
-        imageInfo[imageIndex]?.objects.remove(at: objectIndex)
+        imageData[safeIndex: imageIndex]?.objects.remove(at: objectIndex)
     }
     
     func getObjectsOnImage(imageIndex: Int) -> [ObjectOnImage] {
-        imageInfo[imageIndex]?.objects ?? []
+        imageData[safeIndex: imageIndex]?.objects ?? []
     }
 }

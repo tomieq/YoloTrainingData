@@ -30,15 +30,15 @@ class OutputWriter {
         try? FileManager.default.createDirectory(at: validateLabelsUrl, withIntermediateDirectories: true)
     }
     
-    func store(inputImage: InputImage, info: ImageInfo) {
+    func store(data: ImageData) {
         let imageUrl: URL
         let labelsUrl: URL
         
         
-        let imageFilename = inputImage.filename.replacingOccurrences(of: "/", with: "-")
+        let imageFilename = data.inputImage.filename.replacingOccurrences(of: "/", with: "-")
         let labelFilename = "\(imageFilename.split(".")[0]).txt"
         
-        if info.type == .training {
+        if data.type == .training {
             imageUrl = trainImagesUrl.appendingPathComponent(imageFilename)
             labelsUrl = trainLabelsUrl
             
@@ -50,7 +50,7 @@ class OutputWriter {
             try? FileManager.default.removeItem(at: trainImagesUrl.appendingPathComponent(imageFilename))
         }
         if FileManager.default.fileExists(atPath: imageUrl.path).not {
-            try? FileManager.default.copyItem(at: inputImage.url, to: imageUrl)
+            try? FileManager.default.copyItem(at: data.inputImage.url, to: imageUrl)
         }
     }
 }

@@ -217,11 +217,11 @@ class WebServer {
             if nextCounter > 0 {
                 // form to update image type
                 let form = Form(url: "/image?imageIndex=\(index)", method: "POST", attributes: ["class" : "bg-light"])
-                form.addRaw(html: "<hr>")
                 form.addSelect(name: "type", label: "Image purpose", options: ImageType.allCases.map {
                     FormSelectModel(label: $0.rawValue, value: $0.rawValue)
                 }, selected: project.getImageType(imageIndex: index)?.rawValue)
                 form.addSubmit(name: "updateType", label: "Save", style: .primary, .small)
+                form.addRaw(html: "<hr>")
                 picTemplate["imageTypeForm"] = form
             }
             

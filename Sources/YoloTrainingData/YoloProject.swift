@@ -21,8 +21,8 @@ class YoloProject {
     private var imageData: [ImageData] = []
     private let outputWriter: OutputWriter
     
-    var inputImages: [InputImage] {
-        imageData.map(\.inputImage)
+    var inputImages: [ImageData] {
+        imageData
     }
     var objectLabels: [Label] {
         labels
@@ -39,9 +39,10 @@ class YoloProject {
         self.outputURL = outputURL
         self.labels = []
         
-        self.imageData = try InputImageLoader(inputURL: inputURL, outputURL: outputURL).load()
+        let folder = OutputFolder(inputURL: inputURL, outputURL: outputURL)
+        self.imageData = try InputImageLoader(folder: folder).load()
         logger.i("Loaded \(imageData.count) images")
-        self.outputWriter = OutputWriter(outputURL: outputURL)
+        self.outputWriter = OutputWriter(folder: folder)
     }
     
     func addLabel(name: String) {
@@ -57,7 +58,8 @@ class YoloProject {
         }
         logger.i("Added label \(labelID) on image \(imageIndex)")
         data.objects.append(ObjectOnImage(labelID: labelID, imageArea: imageArea))
-        outputWriter.store(data: data)
+        let newStatus = data.status == .unused ? .forTraining : data.status
+        outputWriter.store(data: data, withStatus: newStatus)
     }
     
     func setImageStatus(imageIndex: Int, status: ImageStatus) {
@@ -65,16 +67,8 @@ class YoloProject {
             logger.e("Invalid image index \(imageIndex)")
             return
         }
+        outputWriter.store(data: data, withStatus: status)
         data.status = status
-        outputWriter.store(data: data)
-    }
-    
-    func setImageSize(imageIndex: Int, size: ImageSize) {
-        guard let data = imageData[safeIndex: imageIndex] else {
-            logger.e("Invalid image index \(imageIndex)")
-            return
-        }
-        data.size = size
     }
     
     func getImageStatus(imageIndex: Int) -> ImageStatus? {
@@ -82,7 +76,14 @@ class YoloProject {
     }
     
     func removeObject(imageIndex: Int, objectIndex: Int) {
-        imageData[safeIndex: imageIndex]?.objects.remove(at: objectIndex)
+        guard let image = imageData[safeIndex: imageIndex] else {
+            return
+        }
+        image.objects.remove(at: objectIndex)
+        if image.objects.isEmpty {
+            image.status = .unused
+        }
+        outputWriter.store(data: image, withStatus: image.status)
     }
     
     func getObjectsOnImage(imageIndex: Int) -> [ObjectOnImage] {

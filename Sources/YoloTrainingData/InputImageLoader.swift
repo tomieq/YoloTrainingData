@@ -9,49 +9,40 @@ import Logger
 
 class InputImageLoader {
     private let logger = Logger(InputImageLoader.self)
-    let inputURL: URL
-    let outputFolder: OutputFolder
+    let folder: OutputFolder
     
-    init(inputURL: URL, outputURL: URL) {
-        self.inputURL = inputURL
-        self.outputFolder = .init(outputURL: outputURL)
+    init(folder: OutputFolder) {
+        self.folder = folder
     }
     
     func load() throws -> [ImageData] {
-        try load(url: inputURL, subdirectory: "")
+        try load(url: folder.inputURL, subdirectory: "", status: .unused) +
+        load(url: folder.trainImagesUrl, subdirectory: "", status: .forTraining) +
+        load(url: folder.validateImagesUrl, subdirectory: "", status: .forValidation)
     }
     
-    private func load(url: URL, subdirectory: String) throws -> [ImageData] {
+    private func load(url: URL, subdirectory: String, status: ImageStatus) throws -> [ImageData] {
         var images: [ImageData] = []
         
         // images from input folder
         for url in try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: []) {
             if url.path.hasSuffix(".jpg").or(url.path.hasSuffix(".png")) {
                 
-                let imageData = ImageData(inputImage: InputImage(url: url, filename: subdirectory + url.lastPathComponent))
-                let labelFilename = imageData.outputFileName.split(".")[0] + ".txt"
-                
-                let validationLabelsUrl = outputFolder.validateLabelsUrl.appendingPathComponent(labelFilename)
-                if FileManager.default.fileExists(atPath: validationLabelsUrl.path) {
-                    loadObjects(to: imageData, from: validationLabelsUrl)
-                    imageData.status = .forValidation
+                let imageData = ImageData(filename: subdirectory + url.lastPathComponent, url: url, status: status)
+                if status != .unused, let labelUrl = folder.currentLabelUrl(image: imageData) {
+                    if FileManager.default.fileExists(atPath: labelUrl.path) {
+                        loadObjects(to: imageData, from: labelUrl)
+                    }
                 }
-                
-                let trainingLabelsUrl = outputFolder.trainLabelsUrl.appendingPathComponent(labelFilename)
-                if FileManager.default.fileExists(atPath: trainingLabelsUrl.path) {
-                    loadObjects(to: imageData, from: trainingLabelsUrl)
-                    imageData.status = .forTraining
-                }
-                
                 images.append(imageData)
                 
             } else if let isDir = try? isDirectory(url: url), isDir {
                 var lowerSubdirectory = subdirectory
                 lowerSubdirectory.append("\(url.lastPathComponent)/")
-                images.append(contentsOf: try load(url: url, subdirectory: lowerSubdirectory))
+                images.append(contentsOf: try load(url: url, subdirectory: lowerSubdirectory, status: status))
             }
         }
-        return images.sorted(by: { $0.inputImage.url.path < $1.inputImage.url.path })
+        return images.sorted(by: { $0.filename < $1.filename })
     }
     
     private func isDirectory(url: URL) throws -> Bool {

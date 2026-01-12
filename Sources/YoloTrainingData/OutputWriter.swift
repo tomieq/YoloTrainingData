@@ -8,45 +8,30 @@ import Foundation
 import SwiftExtensions
 
 class OutputWriter {
-    let outputFolder: OutputFolder
+    let folder: OutputFolder
     
-    init(outputURL: URL) {
-        self.outputFolder = OutputFolder(outputURL: outputURL)
-        try? FileManager.default.createDirectory(at: outputFolder.trainImagesUrl, withIntermediateDirectories: true)
-        try? FileManager.default.createDirectory(at: outputFolder.validateImagesUrl, withIntermediateDirectories: true)
+    init(folder: OutputFolder) {
+        self.folder = folder
+        try? FileManager.default.createDirectory(at: folder.trainImagesUrl, withIntermediateDirectories: true)
+        try? FileManager.default.createDirectory(at: folder.validateImagesUrl, withIntermediateDirectories: true)
         
-        try? FileManager.default.createDirectory(at: outputFolder.trainLabelsUrl, withIntermediateDirectories: true)
-        try? FileManager.default.createDirectory(at: outputFolder.validateLabelsUrl, withIntermediateDirectories: true)
+        try? FileManager.default.createDirectory(at: folder.trainLabelsUrl, withIntermediateDirectories: true)
+        try? FileManager.default.createDirectory(at: folder.validateLabelsUrl, withIntermediateDirectories: true)
     }
     
-    func store(data: ImageData) {
-        let imageUrl: URL
-        let labelsUrl: URL
-        
-        
-        let imageFilename = data.outputFileName
-        let labelFilename = "\(imageFilename.split(".")[0]).txt"
-        
-        if data.status == .forTraining {
-            imageUrl = outputFolder.trainImagesUrl.appendingPathComponent(imageFilename)
-            labelsUrl = outputFolder.trainLabelsUrl.appendingPathComponent(labelFilename)
-            
-            try? FileManager.default.removeItem(at: outputFolder.validateImagesUrl.appendingPathComponent(imageFilename))
-        } else {
-            imageUrl = outputFolder.validateImagesUrl.appendingPathComponent(imageFilename)
-            labelsUrl = outputFolder.validateLabelsUrl.appendingPathComponent(labelFilename)
-            
-            try? FileManager.default.removeItem(at: outputFolder.trainImagesUrl.appendingPathComponent(imageFilename))
-        }
-        if FileManager.default.fileExists(atPath: imageUrl.path).not {
-            try? FileManager.default.copyItem(at: data.inputImage.url, to: imageUrl)
+    func store(data: ImageData, withStatus status: ImageStatus) {
+        // move file
+        if data.status != status {
+            try? FileManager.default.moveItem(at: folder.currentImageUrl(image: data), to: folder.imageUrl(image: data, for: status))
+            if let labelCurrentUrl = folder.currentLabelUrl(image: data), let labelNewUrl = folder.labelUrl(image: data, for: status) {
+                try? FileManager.default.moveItem(at: labelCurrentUrl, to: labelNewUrl)
+            }
         }
         
-        try? FileManager.default.removeItem(at: outputFolder.trainLabelsUrl.appendingPathComponent(labelFilename))
-        try? FileManager.default.removeItem(at: outputFolder.validateLabelsUrl.appendingPathComponent(labelFilename))
-        
-        try? data.yoloImageData.map { $0.serialized }.joined(separator: "\n").write(to: labelsUrl, atomically: false , encoding: .utf8)
-        
+        if let labelUrl = folder.labelUrl(image: data, for: status) {
+            try? data.yoloImageData.map { $0.serialized }.joined(separator: "\n").write(to: labelUrl, atomically: false , encoding: .utf8)
+        }
+
     }
 }
 

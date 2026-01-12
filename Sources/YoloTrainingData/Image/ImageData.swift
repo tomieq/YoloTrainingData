@@ -9,12 +9,12 @@ import SwiftExtensions
 
 class ImageData {
     let inputImage: InputImage
-    var type: ImageType
+    var status: ImageStatus
     var objects: [ObjectOnImage]
     
-    init(inputImage: InputImage, type: ImageType = .training, objects: [ObjectOnImage] = []) {
+    init(inputImage: InputImage, status: ImageStatus = .unused, objects: [ObjectOnImage] = []) {
         self.inputImage = inputImage
-        self.type = type
+        self.status = status
         self.objects = objects
     }
     

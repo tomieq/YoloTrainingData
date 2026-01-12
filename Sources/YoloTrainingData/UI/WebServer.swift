@@ -185,8 +185,8 @@ class WebServer {
             if let labelIndexToRemove = request.queryParams.get("removeLabelIndex")?.decimal {
                 project.removeObject(imageIndex: index, objectIndex: labelIndexToRemove)
             }
-            if let type = request.formData["type"], let imageType = ImageType(rawValue: type) {
-                project.setImageType(imageIndex: index, type: imageType)
+            if let type = request.formData["status"], let imageStatus = ImageStatus(rawValue: type) {
+                project.setImageStatus(imageIndex: index, status: imageStatus)
             }
             
             
@@ -215,16 +215,15 @@ class WebServer {
                 nextCounter = counter.incremented
             }
             
-            if nextCounter > 0 {
-                // form to update image type
-                let form = Form(url: "/image?imageIndex=\(index)", method: "POST", attributes: ["class" : "bg-light"])
-                form.addSelect(name: "type", label: "Image purpose", options: ImageType.allCases.map {
-                    FormSelectModel(label: $0.rawValue, value: $0.rawValue)
-                }, selected: project.getImageType(imageIndex: index)?.rawValue)
-                form.addSubmit(name: "updateType", label: "Save", style: .primary, .small)
-                form.addRaw(html: "<hr>")
-                picTemplate["imageTypeForm"] = form
-            }
+            // form to update image type
+            let form = Form(url: "/image?imageIndex=\(index)", method: "POST", attributes: ["class" : "bg-light"])
+            form.addSelect(name: "status", label: "Image purpose", options: ImageStatus.allCases.map {
+                FormSelectModel(label: $0.rawValue, value: $0.rawValue)
+            }, selected: project.getImageStatus(imageIndex: index)?.rawValue)
+            form.addSubmit(name: "updateType", label: "Save", style: .primary, .small)
+            form.addRaw(html: "<hr>")
+            picTemplate["imageTypeForm"] = form
+            
             
             template["content"] = picTemplate
             let mainTemplate = wrapTemplate(template)

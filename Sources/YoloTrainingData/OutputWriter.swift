@@ -27,7 +27,7 @@ class OutputWriter {
         let imageFilename = data.outputFileName
         let labelFilename = "\(imageFilename.split(".")[0]).txt"
         
-        if data.type == .training {
+        if data.status == .forTraining {
             imageUrl = outputFolder.trainImagesUrl.appendingPathComponent(imageFilename)
             labelsUrl = outputFolder.trainLabelsUrl.appendingPathComponent(labelFilename)
             

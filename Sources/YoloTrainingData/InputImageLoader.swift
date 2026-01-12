@@ -34,13 +34,13 @@ class InputImageLoader {
                 let validationLabelsUrl = outputFolder.validateLabelsUrl.appendingPathComponent(labelFilename)
                 if FileManager.default.fileExists(atPath: validationLabelsUrl.path) {
                     loadObjects(to: imageData, from: validationLabelsUrl)
-                    imageData.type = .validation
+                    imageData.status = .forValidation
                 }
                 
                 let trainingLabelsUrl = outputFolder.trainLabelsUrl.appendingPathComponent(labelFilename)
                 if FileManager.default.fileExists(atPath: trainingLabelsUrl.path) {
                     loadObjects(to: imageData, from: trainingLabelsUrl)
-                    imageData.type = .training
+                    imageData.status = .forTraining
                 }
                 
                 images.append(imageData)

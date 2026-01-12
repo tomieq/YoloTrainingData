@@ -60,12 +60,12 @@ class YoloProject {
         outputWriter.store(data: data)
     }
     
-    func setImageType(imageIndex: Int, type: ImageType) {
+    func setImageStatus(imageIndex: Int, status: ImageStatus) {
         guard let data = imageData[safeIndex: imageIndex] else {
             logger.e("Invalid image index \(imageIndex)")
             return
         }
-        data.type = type
+        data.status = status
         outputWriter.store(data: data)
     }
     
@@ -77,8 +77,8 @@ class YoloProject {
         data.size = size
     }
     
-    func getImageType(imageIndex: Int) -> ImageType? {
-        imageData[safeIndex: imageIndex]?.type
+    func getImageStatus(imageIndex: Int) -> ImageStatus? {
+        imageData[safeIndex: imageIndex]?.status
     }
     
     func removeObject(imageIndex: Int, objectIndex: Int) {

@@ -23,6 +23,7 @@ class ImageData {
     
     lazy var size: ImageSize = {
         guard let image = Image(url: url) else {
+            fatalError("Cant read size of image at \(url.path)")
             return ImageSize(width: 0, height: 0)
         }
         return ImageSize(width: image.size.width, height: image.size.height)

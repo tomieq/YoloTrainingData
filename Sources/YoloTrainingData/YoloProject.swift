@@ -81,7 +81,6 @@ class YoloProject {
             return
         }
         outputWriter.store(data: data, withStatus: status)
-        data.status = status
     }
     
     func getImageStatus(imageIndex: Int) -> ImageStatus? {
@@ -92,11 +91,13 @@ class YoloProject {
         guard let image = imageData[safeIndex: imageIndex] else {
             return
         }
+        logger.i("Removed label \(objectIndex) on image \(imageIndex)")
         image.objects.remove(at: objectIndex)
+        var newStatus = image.status
         if image.objects.isEmpty {
-            image.status = .unused
+            newStatus = .unused
         }
-        outputWriter.store(data: image, withStatus: image.status)
+        outputWriter.store(data: image, withStatus: newStatus)
     }
     
     func getObjectsOnImage(imageIndex: Int) -> [ObjectOnImage] {

@@ -16,9 +16,10 @@ class InputImageLoader {
     }
     
     func load() throws -> [ImageData] {
-        try load(url: folder.inputURL, subdirectory: "", status: .unused) +
+        (try load(url: folder.inputURL, subdirectory: "", status: .unused) +
         load(url: folder.trainImagesUrl, subdirectory: "", status: .forTraining) +
         load(url: folder.validateImagesUrl, subdirectory: "", status: .forValidation)
+        ).sorted { $0.filename < $1.filename }
     }
     
     private func load(url: URL, subdirectory: String, status: ImageStatus) throws -> [ImageData] {
@@ -54,7 +55,6 @@ class InputImageLoader {
         if let yoloDataLines = try? String(contentsOf: url, encoding: .utf8).split("\n") {
             let yoloData = yoloDataLines.compactMap { YoloImageData(serialized: $0) }
             let objects = yoloData.map { yoloData in
-                
                 let areaWidth = Int(Double(imageData.size.width) * yoloData.width)
                 let areaHeight = Int(Double(imageData.size.height) * yoloData.height)
                 

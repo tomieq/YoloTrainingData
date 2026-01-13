@@ -41,8 +41,8 @@ struct OutputFolder {
         try? FileManager.default.createDirectory(at: trainImagesUrl, withIntermediateDirectories: true)
         try? FileManager.default.createDirectory(at: validateImagesUrl, withIntermediateDirectories: true)
         
-        trainLabelsUrl = Self.appending(relativePath: trainPath.replacingOccurrences(of: "/images", with: "/labels"), to: outputURL)
-        validateLabelsUrl = Self.appending(relativePath: valPath.replacingOccurrences(of: "/images", with: "/labels"), to: outputURL)
+        trainLabelsUrl = Self.appending(relativePath: trainPath.replacingOccurrences(of: "images", with: "/labels"), to: outputURL)
+        validateLabelsUrl = Self.appending(relativePath: valPath.replacingOccurrences(of: "images", with: "/labels"), to: outputURL)
         
         logger.i("train images url: \(trainImagesUrl)")
         logger.i("train labels url: \(trainLabelsUrl)")

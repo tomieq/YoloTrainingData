@@ -184,6 +184,7 @@ class WebServer {
             }
             if let labelIndexToRemove = request.queryParams.get("removeLabelIndex")?.decimal {
                 project.removeObject(imageIndex: index, objectIndex: labelIndexToRemove)
+                return .movedTemporarily("/image?imageIndex=\(index)")
             }
             if let type = request.formData["status"], let imageStatus = ImageStatus(rawValue: type) {
                 project.setImageStatus(imageIndex: index, status: imageStatus)

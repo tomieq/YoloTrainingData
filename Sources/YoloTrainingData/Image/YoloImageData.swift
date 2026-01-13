@@ -22,8 +22,9 @@ struct YoloImageData {
         self.height = height
     }
     
-    init (serialized: String) {
+    init? (serialized: String) {
         let parts = serialized.split(" ")
+        guard parts.count == 5 else { return nil }
 
         self.classID = Int(parts[0])!
         self.centerX = Double(parts[1])!

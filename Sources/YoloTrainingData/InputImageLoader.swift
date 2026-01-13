@@ -24,6 +24,7 @@ class InputImageLoader {
     private func load(url: URL, subdirectory: String, status: ImageStatus) throws -> [ImageData] {
         var images: [ImageData] = []
         
+        logger.i("Loading images from \(url.path)")
         // images from input folder
         for url in try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: []) {
             if url.path.hasSuffix(".jpg").or(url.path.hasSuffix(".png")) {
@@ -50,9 +51,8 @@ class InputImageLoader {
     }
     
     func loadObjects(to imageData: ImageData, from url: URL) {
-        logger.d("Loading objects for \(url.path)")
         if let yoloDataLines = try? String(contentsOf: url, encoding: .utf8).split("\n") {
-            let yoloData = yoloDataLines.map { YoloImageData(serialized: $0) }
+            let yoloData = yoloDataLines.compactMap { YoloImageData(serialized: $0) }
             let objects = yoloData.map { yoloData in
                 
                 let areaWidth = Int(Double(imageData.size.width) * yoloData.width)
@@ -64,7 +64,6 @@ class InputImageLoader {
                                                           width: areaWidth,
                                                           height: areaHeight))
             }
-            logger.i("Loaded \(objects.count) objects from \(url.path)")
             imageData.objects = objects
         }
     }

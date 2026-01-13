@@ -8,21 +8,22 @@ import Foundation
 import Env
 import SwiftExtensions
 
-print("Started")
+
 
 enum ConfirError: Error {
     case noInputUrl
-    case noOutputUrl
+    case noYoloUrl
 }
 
 let env = Env("local.env")
 
 let inputUrl = try env.get("INPUT_URL") ?! ConfirError.noInputUrl
-let outputUrl = try env.get("OUTPUT_URL") ?! ConfirError.noOutputUrl
+let yoloConfigUrl = try env.get("YOLO_YML_URL") ?! ConfirError.noYoloUrl
+
+print("Started with \(yoloConfigUrl)")
 
 let project = try YoloProject(inputURL: URL(fileURLWithPath: inputUrl, isDirectory: true),
-                              outputURL: URL(fileURLWithPath: outputUrl, isDirectory: true))
+                              yoloConfigUrl: URL(fileURLWithPath: yoloConfigUrl, isDirectory: true))
 
-project.addLabel(name: "license")
 let webServer = WebServer(project: project, env: env)
 RunLoop.main.run()

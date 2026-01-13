@@ -5,11 +5,16 @@
 //  Created by: tomieq on 09/01/2026
 //
 import Foundation
+import SwiftExtensions
+import Yams
+import Logger
 
 struct OutputFolder {
     
+    private let logger = Logger(OutputFolder.self)
     let inputURL: URL
     let outputURL: URL
+    let yoloConfigUrl: URL
     
     let trainImagesUrl: URL
     let validateImagesUrl: URL
@@ -17,19 +22,31 @@ struct OutputFolder {
     let trainLabelsUrl: URL
     let validateLabelsUrl: URL
     
-    init(inputURL: URL, outputURL: URL) {
+    init(inputURL: URL, yoloConfigUrl: URL) {
         self.inputURL = inputURL
-        self.outputURL = outputURL
+        self.outputURL = yoloConfigUrl.deletingLastPathComponent()
+        self.yoloConfigUrl = yoloConfigUrl
         
-        let imagesUrl = outputURL.appendingPathComponent("images")
-        trainImagesUrl = imagesUrl.appendingPathComponent("train")
-        validateImagesUrl = imagesUrl.appendingPathComponent("val")
+        var trainPath = "images/train"
+        var valPath = "images/val"
+        
+        if let yamlString = try? String(contentsOf: yoloConfigUrl),
+            let config = try? YAMLDecoder().decode(YoloConfig.self, from: yamlString) {
+            trainPath = config.train
+            valPath = config.val
+        }
+        trainImagesUrl = Self.appending(relativePath: trainPath, to: outputURL)
+        validateImagesUrl = Self.appending(relativePath: valPath, to: outputURL)
+        
         try? FileManager.default.createDirectory(at: trainImagesUrl, withIntermediateDirectories: true)
         try? FileManager.default.createDirectory(at: validateImagesUrl, withIntermediateDirectories: true)
         
-        let labelsUrl = outputURL.appendingPathComponent("labels")
-        trainLabelsUrl = labelsUrl.appendingPathComponent("train")
-        validateLabelsUrl = labelsUrl.appendingPathComponent("val")
+        trainLabelsUrl = Self.appending(relativePath: trainPath.replacingOccurrences(of: "/images", with: "/labels"), to: outputURL)
+        validateLabelsUrl = Self.appending(relativePath: valPath.replacingOccurrences(of: "/images", with: "/labels"), to: outputURL)
+        
+        logger.i("train images url: \(trainImagesUrl)")
+        logger.i("train labels url: \(trainLabelsUrl)")
+        
         try? FileManager.default.createDirectory(at: trainLabelsUrl, withIntermediateDirectories: true)
         try? FileManager.default.createDirectory(at: validateLabelsUrl, withIntermediateDirectories: true)
     }
@@ -58,10 +75,33 @@ struct OutputFolder {
         case .unused:
             nil
         case .forTraining:
-            trainLabelsUrl.appendingPathComponent(image.filename.replacingOccurrences(of: "/", with: "-").split(".")[0] + ".txt")
+            labelUrl(base: trainLabelsUrl, imageFilename: image.filename)
         case .forValidation:
-            validateLabelsUrl.appendingPathComponent(image.filename.replacingOccurrences(of: "/", with: "-").split(".")[0] + ".txt")
+            labelUrl(base: validateLabelsUrl, imageFilename: image.filename)
         }
+    }
+    
+    private static func appending(relativePath: String, to baseURL: URL) -> URL {
+        var url = baseURL
+
+        for component in relativePath.split(separator: "/") {
+            if component == ".." {
+                url.deleteLastPathComponent()
+            } else if component != "." {
+                url.appendPathComponent(String(component))
+            }
+        }
+
+        return url
+    }
+    
+    private func labelUrl(base: URL, imageFilename: String) -> URL {
+        var parts = imageFilename.replacingOccurrences(of: "/", with: "-").split(".")
+        parts.removeLast()
+        parts.append("txt")
+        var base = base
+        base.appendPathComponent(parts.joined(separator: "."))
+        return base
     }
 }
 

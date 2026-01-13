@@ -17,6 +17,7 @@ class OutputWriter {
         
         try? FileManager.default.createDirectory(at: folder.trainLabelsUrl, withIntermediateDirectories: true)
         try? FileManager.default.createDirectory(at: folder.validateLabelsUrl, withIntermediateDirectories: true)
+
     }
     
     func store(data: ImageData, withStatus status: ImageStatus) {

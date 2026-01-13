@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "YoloTrainingData",
+    platforms: [
+        .macOS(.v13)
+    ],
     dependencies: [
         .package(url: "https://github.com/tomieq/BootstrapStarter", branch: "master"),
         .package(url: "https://github.com/tomieq/swifter", from: "3.0.0"),
@@ -12,7 +15,8 @@ let package = Package(
         .package(url: "https://github.com/tomieq/Logger", from: "1.1.0"),
         .package(url: "https://github.com/tomieq/SwiftExtensions", from: "2.0.0"),
         .package(url: "https://github.com/tomieq/Env", from: "1.0.0"),
-        .package(url: "https://github.com/twostraws/SwiftGD.git", from: "2.0.0")
+        .package(url: "https://github.com/twostraws/SwiftGD.git", from: "2.0.0"),
+        .package(url: "https://github.com/jpsim/Yams.git", from: "6.2.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -26,7 +30,8 @@ let package = Package(
                 .product(name: "Logger", package: "Logger"),
                 .product(name: "SwiftExtensions", package: "SwiftExtensions"),
                 .product(name: "Env", package: "Env"),
-                .product(name: "SwiftGD", package: "SwiftGD")
+                .product(name: "SwiftGD", package: "SwiftGD"),
+                .product(name: "Yams", package: "Yams")
             ]
         ),
     ]

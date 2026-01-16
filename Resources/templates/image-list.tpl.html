@@ -1,5 +1,19 @@
-<ul>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Filename</th>
+      <th scope="col">Annotated</th>
+      <th scope="col">Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
 [START image]
-<li> <a href="/image?imageIndex={imageIndex}">{filename}</a></li>
+<tr>
+  <th scope="row">{imageIndex}</th>
+  <td><a href="/image?imageIndex={imageIndex}">{filename}</a></td>
+  <td>{annotation}</td>
+  <td>{purpose}</td>
+</tr>
 [END image]
-</ul>
+</table>

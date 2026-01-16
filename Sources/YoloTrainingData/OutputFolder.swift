@@ -60,10 +60,15 @@ struct OutputFolder {
         case .unused:
             inputURL.appendingPathComponent(image.filename)
         case .forTraining:
-            trainImagesUrl.appendingPathComponent(image.filename.replacingOccurrences(of: "/", with: "-"))
+            trainImagesUrl.appendingPathComponent(unifyFilename(image.filename))
         case .forValidation:
-            validateImagesUrl.appendingPathComponent(image.filename.replacingOccurrences(of: "/", with: "-"))
+            validateImagesUrl.appendingPathComponent(unifyFilename(image.filename))
         }
+    }
+    
+    private func unifyFilename(_ filename: String) -> String {
+        filename.replacingOccurrences(of: "/", with: "-")
+            .replacingOccurrences(of: " ", with: "-")
     }
     
     func currentLabelUrl(image: ImageData) -> URL? {
@@ -96,7 +101,7 @@ struct OutputFolder {
     }
     
     private func labelUrl(base: URL, imageFilename: String) -> URL {
-        var parts = imageFilename.replacingOccurrences(of: "/", with: "-").split(".")
+        var parts = unifyFilename(imageFilename).split(".")
         parts.removeLast()
         parts.append("txt")
         var base = base

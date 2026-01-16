@@ -147,9 +147,20 @@ class WebServer {
         // list of input images
         server["/images"] = { [unowned self] request, _ in
 
+            func statusIcon(_ status: ImageStatus) -> String {
+                switch status {
+                case .unused: return "-"
+                case .forTraining: return "🧠 training"
+                case .forValidation: return "🍀 validation"
+                }
+            }
             let listTemplate = Template.cached(relativePath: "templates/image-list.tpl.html")
             for (index, image) in project.inputImages.enumerated() {
-                listTemplate.assign(["imageIndex": "\(index)", "filename": image.filename], inNest: "image")
+                listTemplate.assign(["imageIndex": "\(index)",
+                                     "filename": image.filename,
+                                     "annotation" : image.objects.isEmpty ? "🔴" : "\(image.objects.count)",
+                                     "purpose" : statusIcon(image.status)
+                                    ], inNest: "image")
             }
             let template = self.pageTemplate
             template["content"] = listTemplate
